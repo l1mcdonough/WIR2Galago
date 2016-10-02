@@ -1,0 +1,13 @@
+core/eval/
+core/index/
+core/parse/
+core/retrieval/
+core/scoring/
+core/store/
+core/types/
+core/util/
+
+BatchSearch.java
+BuildIndex.java
+Search.java
+SearchWebHandler.java
