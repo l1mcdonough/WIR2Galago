@@ -2,6 +2,8 @@
 
 package org.galagosearch.core.tools;
 
+import org.galagosearch.exercises.Crawler;
+import java.net.URL;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -433,7 +435,9 @@ public class App {
             handleBatchSearch(args);
         } else if (command.equals("build")) {
             handleBuild(args);
-        } else if (command.equals("doc")) {
+        } else if (command.equals("crawl")){
+        	handleCrawl(Utility.subarray(args, 1));  
+        }else if (command.equals("doc")) {
             handleDoc(args);
         } else if (command.equals("dump-connection")) {
             handleDumpConnection(args);
@@ -452,6 +456,16 @@ public class App {
         } else {
             usage();
         }
+    }
+    
+    private void handleCrawl(String[] args) throws Exception {
+    	Crawler crawler = new Crawler();
+    	// Create URL object (e.g., passing https://en.wikipedia.org/wiki/Chmod)
+    	URL seedUrl = new URL(args[0]);
+    	// Set the folder for storing downloaded HTML files
+    	crawler.setFolder(args[1]);
+    	// Call a method run in Crawler passing URL object
+    	crawler.run(seedUrl);
     }
 
     public static void main(String[] args) throws Exception {
