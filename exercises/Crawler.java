@@ -8,6 +8,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Queue;
@@ -37,8 +38,23 @@ public class Crawler {
 		return text;
 	}
 	
+	public ArrayList<String> getLinks (Document document){
+		ArrayList<String> links = new ArrayList<String>();
+		for(Tag tag : document.tags){
+			if (tag.name.equals("a")){
+				links.add(tag.attributes.get("href"));
+			}
+		}
+		return links;
+	}
 	public void run(URL seedURL) throws IOException{
 		String siteText = fetchUrlToString(seedURL);
 		System.out.println(siteText);
+		Document document = new TagTokenizer().tokenize(siteText);
+		ArrayList<String> links = getLinks(document);
+		for (String ref : links){
+			System.out.println(ref);
+		}
 	}
+	
 }
