@@ -47,13 +47,24 @@ public class Crawler {
 		}
 		return links;
 	}
+	public URL getBaseURL(URL url) throws MalformedURLException{
+		String comURL = url.toString();
+		String[] splitURL = comURL.split("//");
+		int leftCount = splitURL[0].length();
+		int rightCount = splitURL[1].indexOf('/');
+		String baseURL = comURL.substring(0, leftCount+rightCount+2);
+		System.out.println(baseURL);
+		return new URL(baseURL);
+	}
 	public void run(URL seedURL) throws IOException{
 		String siteText = fetchUrlToString(seedURL);
 		System.out.println(siteText);
 		Document document = new TagTokenizer().tokenize(siteText);
+		Queue<URL> URLS = new LinkedList<URL>();
+		HashSet<URL> seen = new HashSet<URL>();
 		ArrayList<String> links = getLinks(document);
 		for (String ref : links){
-			System.out.println(ref);
+			System.out.println(getBaseURL(seedURL) + ref);
 		}
 	}
 	
