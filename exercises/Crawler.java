@@ -47,24 +47,55 @@ public class Crawler {
 		}
 		return links;
 	}
-	public URL getBaseURL(URL url) throws MalformedURLException{
+	public String getBaseURL(URL url) throws MalformedURLException {
 		String comURL = url.toString();
 		String[] splitURL = comURL.split("//");
 		int leftCount = splitURL[0].length();
 		int rightCount = splitURL[1].indexOf('/');
 		String baseURL = comURL.substring(0, leftCount+rightCount+2);
-		System.out.println(baseURL);
-		return new URL(baseURL);
+		return baseURL;
+	}
+	public URL getFullURL(URL current, String target) throws MalformedURLException{
+		if(target == null){
+			return null;
+		}
+		else if (target.charAt(0)=='#'){
+			return new URL(current.toString() + target);
+		}
+		else if (target.substring(0,2).equals("//")){
+			
+			return new URL("http:" + target) ;
+		}
+		else if (target.substring(0,1).equals("/")){
+			return new URL(getBaseURL(current) + target);
+		}
+		else {
+			return(new URL(target));
+		}
 	}
 	public void run(URL seedURL) throws IOException{
-		String siteText = fetchUrlToString(seedURL);
-		System.out.println(siteText);
-		Document document = new TagTokenizer().tokenize(siteText);
-		Queue<URL> URLS = new LinkedList<URL>();
-		HashSet<URL> seen = new HashSet<URL>();
-		ArrayList<String> links = getLinks(document);
-		for (String ref : links){
-			System.out.println(getBaseURL(seedURL) + ref);
+		String siteText;
+		for(int i=0; i<10; i++){
+			siteText = fetchUrlToString(seedURL);
+			System.out.println("Visiting " + seedURL);
+			Document document = new TagTokenizer().tokenize(siteText);
+			Queue<URL> URLS = new LinkedList<URL>();
+			HashSet<URL> seen = new HashSet<URL>();
+			ArrayList<String> links = getLinks(document);
+			for (String ref : links){
+				//System.out.println(getFullURL(seedURL, ref));
+				URLS.add(getFullURL(seedURL, ref));
+			}
+			seedURL = URLS.poll();
+			while(seedURL==null)
+				seedURL = URLS.poll();
+			if(i!=9){
+				try{
+					Thread.sleep(5000);
+				}catch(Exception e){
+					System.out.println("Sleep Interupted");
+				}
+			}
 		}
 	}
 	
