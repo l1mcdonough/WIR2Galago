@@ -78,22 +78,24 @@ public class Crawler {
 	    System.out.println("Current dir: "+current);
 		new File(folder).mkdir();
 		Queue<URL> URLS = new LinkedList<URL>();
+		HashSet<URL> seen = new HashSet<URL>();
 		for(int i=0; i<10; i++){
 			siteText = fetchUrlToString(seedURL);
 			PrintWriter fileWriter = new PrintWriter(folder+"/"+i, "UTF-8");
 			fileWriter.print(siteText);
 			fileWriter.close();
-			Document document = new TagTokenizer().tokenize(siteText);
-			HashSet<URL> seen = new HashSet<URL>();
+			Document document = new TagTokenizer().tokenize(siteText);			
 			ArrayList<String> links = getLinks(document);
 			int count=0;
 			for (String ref : links){
-				if(ref != null && ref.charAt(0) != '#'){
-					URLS.add(getFullURL(seedURL, ref));
+				if(ref != null && ref.charAt(0) != '#' && !seen.contains(ref)){
+					URL fullURL = getFullURL(seedURL, ref);
+					URLS.add(fullURL);
+					seen.add(fullURL);
 					count++;
 				}
 			}
-			System.out.println("Crawler Found " + count + " Websites in "+ seedURL);
+			System.out.println("Crawler Found " + count + " New Webpages in "+ seedURL);
 			seedURL = URLS.poll();
 			while(seedURL==null)
 				seedURL = URLS.poll();
