@@ -37,6 +37,7 @@ public class Crawler {
 		while(textGetter.hasNext()){
 			text += textGetter.next() + " ";
 		}
+		System.out.println("Found HTML");
 		return text;
 	}
 	
@@ -81,7 +82,7 @@ public class Crawler {
 		HashSet<URL> seen = new HashSet<URL>();
 		for(int i=0; i<10; i++){
 			siteText = fetchUrlToString(seedURL);
-			PrintWriter fileWriter = new PrintWriter(folder+"/"+i, "UTF-8");
+			PrintWriter fileWriter = new PrintWriter(folder + "/" + i + ".html", "UTF-8");
 			fileWriter.print(siteText);
 			fileWriter.close();
 			Document document = new TagTokenizer().tokenize(siteText);			
