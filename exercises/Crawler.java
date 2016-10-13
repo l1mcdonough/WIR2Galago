@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -28,6 +29,7 @@ public class Crawler {
 	}
 	
 	public String fetchUrlToString(URL site) throws IOException{
+		System.out.println("Crawling " + site);
 		URLConnection connection = site.openConnection();
 		connection.connect();
 		Scanner textGetter = new Scanner(connection.getInputStream());
@@ -59,9 +61,6 @@ public class Crawler {
 		if(target == null){
 			return null;
 		}
-		else if (target.charAt(0)=='#'){
-			return new URL(current.toString() + target);
-		}
 		else if (target.substring(0,2).equals("//")){
 			
 			return new URL("http:" + target) ;
@@ -75,21 +74,27 @@ public class Crawler {
 	}
 	public void run(URL seedURL) throws IOException{
 		String siteText;
+		String current = new java.io.File( "." ).getCanonicalPath();
+	    System.out.println("Current dir: "+current);
+		new File(folder).mkdir();
 		Queue<URL> URLS = new LinkedList<URL>();
 		for(int i=0; i<10; i++){
 			siteText = fetchUrlToString(seedURL);
-			System.out.println("Visiting " + seedURL);
+			PrintWriter fileWriter = new PrintWriter(folder+"/"+i, "UTF-8");
+			fileWriter.print(siteText);
+			fileWriter.close();
 			Document document = new TagTokenizer().tokenize(siteText);
 			HashSet<URL> seen = new HashSet<URL>();
 			ArrayList<String> links = getLinks(document);
+			int count=0;
 			for (String ref : links){
-				//System.out.println(getFullURL(seedURL, ref));
-				URLS.add(getFullURL(seedURL, ref));
-				if (i == 0)
-					System.out.println("adding link: " + getFullURL(seedURL, ref));
+				if(ref != null && ref.charAt(0) != '#'){
+					URLS.add(getFullURL(seedURL, ref));
+					count++;
+				}
 			}
+			System.out.println("Crawler Found " + count + " Websites in "+ seedURL);
 			seedURL = URLS.poll();
-			System.out.println("Next link is" + URLS.poll());
 			while(seedURL==null)
 				seedURL = URLS.poll();
 			if(i!=9){
