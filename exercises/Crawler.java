@@ -75,18 +75,21 @@ public class Crawler {
 	}
 	public void run(URL seedURL) throws IOException{
 		String siteText;
+		Queue<URL> URLS = new LinkedList<URL>();
 		for(int i=0; i<10; i++){
 			siteText = fetchUrlToString(seedURL);
 			System.out.println("Visiting " + seedURL);
 			Document document = new TagTokenizer().tokenize(siteText);
-			Queue<URL> URLS = new LinkedList<URL>();
 			HashSet<URL> seen = new HashSet<URL>();
 			ArrayList<String> links = getLinks(document);
 			for (String ref : links){
 				//System.out.println(getFullURL(seedURL, ref));
 				URLS.add(getFullURL(seedURL, ref));
+				if (i == 0)
+					System.out.println("adding link: " + getFullURL(seedURL, ref));
 			}
 			seedURL = URLS.poll();
+			System.out.println("Next link is" + URLS.poll());
 			while(seedURL==null)
 				seedURL = URLS.poll();
 			if(i!=9){
